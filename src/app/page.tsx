@@ -1,7 +1,7 @@
 export default function Home() {
-return ( <main className="min-h-screen bg-white text-slate-900">
+return (
+  <main className="min-h-screen bg-white text-slate-900">
 
-```
   <section className="mx-auto max-w-6xl px-6 py-24">
     <div className="max-w-4xl">
       <div className="mb-6 inline-flex rounded-full border px-4 py-2 text-sm">

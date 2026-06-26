@@ -17,17 +17,17 @@ export default function SignupPage() {
   ) => {
     e.preventDefault();
 
-    console.log("SIGNUP CLICK");
-    
     setLoading(true);
     setMessage("");
 
-    const supabase = createBrowserSupabaseClient();
+    const supabase =
+      createBrowserSupabaseClient();
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    const { error } =
+      await supabase.auth.signUp({
+        email,
+        password,
+      });
 
     if (error) {
       setMessage(error.message);
@@ -35,7 +35,9 @@ export default function SignupPage() {
       return;
     }
 
-    setMessage("Compte créé avec succès.");
+    setMessage(
+      "Compte créé avec succès."
+    );
 
     setTimeout(() => {
       router.push("/profile");
@@ -49,14 +51,16 @@ export default function SignupPage() {
         className="w-full max-w-md rounded-xl border p-8"
       >
         <h1 className="mb-6 text-3xl font-bold">
-          Créer un compte TEST123
+          Créer un compte
         </h1>
 
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           className="mb-4 w-full rounded-lg border p-3"
           required
         />
@@ -65,25 +69,21 @@ export default function SignupPage() {
           type="password"
           placeholder="Mot de passe"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
           className="mb-4 w-full rounded-lg border p-3"
           required
         />
-
-       <div
-          onClick={() => alert("CLICK OK")}
-          className="mb-4 rounded border p-4 cursor-pointer"
-        >
-          TEST CLICK
-        </div> 
-
 
         <button
           type="submit"
           disabled={loading}
           className="w-full rounded-lg bg-black px-4 py-3 text-white"
         >
-          {loading ? "Création..." : "BOUTON TEST 999"}
+          {loading
+            ? "Création..."
+            : "Créer un compte"}
         </button>
 
         {message && (

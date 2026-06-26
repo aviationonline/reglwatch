@@ -3,13 +3,8 @@ nohup: ignoring input
 > reglwatch@0.1.0 start
 > next start
 
-⨯ Failed to start server
-Error: listen EADDRINUSE: address already in use :::3000
-    at <unknown> (Error: listen EADDRINUSE: address already in use :::3000)
-    at new Promise (<anonymous>) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 3000
-}
+▲ Next.js 16.2.9
+- Local:         http://localhost:3000
+- Network:       http://62.72.16.194:3000
+✓ Ready in 144ms
+CHECKOUT USER ID: 79aaf6ea-a1ae-470e-893b-25285a150f5f

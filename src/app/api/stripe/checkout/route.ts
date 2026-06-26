@@ -5,8 +5,15 @@ export async function POST(
   request: NextRequest
 ) {
   try {
-    const { priceId } =
-      await request.json();
+    const {
+      priceId,
+      userId,
+    } = await request.json();
+
+    console.log(
+      "CHECKOUT USER ID:",
+      userId
+    );
 
     const session =
       await stripe.checkout.sessions.create({
@@ -21,6 +28,10 @@ export async function POST(
 
         subscription_data: {
           trial_period_days: 14,
+
+          metadata: {
+            user_id: userId,
+          },
         },
 
         success_url:
@@ -34,6 +45,11 @@ export async function POST(
       url: session.url,
     });
   } catch (error) {
+    console.error(
+      "STRIPE CHECKOUT ERROR:",
+      error
+    );
+
     return NextResponse.json(
       {
         error: "Erreur Stripe",

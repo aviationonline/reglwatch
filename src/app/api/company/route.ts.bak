@@ -1,0 +1,218 @@
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase/server";
+
+export async function POST(request: NextRequest) {
+try {
+const body = await request.json();
+
+const {
+  user_id,
+  company_name,
+  legal_form,
+  employees,
+  sector,
+} = body;
+
+const { data, error } = await supabaseAdmin
+  .from("companies")
+  .upsert(
+    {
+      user_id,
+      company_name,
+      legal_form,
+      employees,
+      sector,
+    },
+    {
+      onConflict: "user_id",
+    }
+  )
+  .select();
+
+if (error) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: error.message,
+    },
+    { status: 500 }
+  );
+}
+
+const { count } = await supabaseAdmin
+  .from("alerts")
+  .select("*", {
+    count: "exact",
+    head: true,
+  })
+  .eq("user_id", user_id);
+
+if (count === 0) {
+  let alerts = [];
+
+  switch (sector) {
+    case "Commerce":
+      alerts = [
+        {
+          user_id,
+          title: "DUERP",
+          urgency: "high",
+          summary: "Vérifiez la mise à jour du DUERP.",
+        },
+        {
+          user_id,
+          title: "Registre unique du personnel",
+          urgency: "high",
+          summary: "Contrôlez la tenue du registre.",
+        },
+        {
+          user_id,
+          title: "Affichages obligatoires",
+          urgency: "medium",
+          summary: "Vérifiez les affichages légaux.",
+        },
+        {
+          user_id,
+          title: "Conformité RGPD",
+          urgency: "low",
+          summary: "Contrôlez vos traitements de données.",
+        },
+      ];
+      break;
+
+    case "Restauration":
+      alerts = [
+        {
+          user_id,
+          title: "Plan HACCP",
+          urgency: "high",
+          summary: "Vérifiez votre plan HACCP.",
+        },
+        {
+          user_id,
+          title: "Registre allergènes",
+          urgency: "high",
+          summary: "Contrôlez les informations allergènes.",
+        },
+        {
+          user_id,
+          title: "DUERP",
+          urgency: "medium",
+          summary: "Vérifiez la mise à jour du DUERP.",
+        },
+        {
+          user_id,
+          title: "Affichages obligatoires",
+          urgency: "medium",
+          summary: "Vérifiez les affichages réglementaires.",
+        },
+      ];
+      break;
+
+    case "BTP":
+      alerts = [
+        {
+          user_id,
+          title: "Carte BTP",
+          urgency: "high",
+          summary: "Vérifiez la validité des cartes BTP.",
+        },
+        {
+          user_id,
+          title: "PPSPS",
+          urgency: "high",
+          summary: "Contrôlez les plans de prévention.",
+        },
+        {
+          user_id,
+          title: "DUERP",
+          urgency: "medium",
+          summary: "Mettez à jour le DUERP.",
+        },
+        {
+          user_id,
+          title: "Registre sécurité",
+          urgency: "medium",
+          summary: "Contrôlez les registres obligatoires.",
+        },
+      ];
+      break;
+
+    case "Transport":
+      alerts = [
+        {
+          user_id,
+          title: "Temps de conduite",
+          urgency: "high",
+          summary: "Contrôlez les temps de conduite.",
+        },
+        {
+          user_id,
+          title: "Tachygraphe",
+          urgency: "high",
+          summary: "Vérifiez les relevés tachygraphes.",
+        },
+        {
+          user_id,
+          title: "FIMO / FCO",
+          urgency: "medium",
+          summary: "Contrôlez les formations obligatoires.",
+        },
+        {
+          user_id,
+          title: "DUERP",
+          urgency: "medium",
+          summary: "Mettez à jour le DUERP.",
+        },
+      ];
+      break;
+
+    default:
+      alerts = [
+        {
+          user_id,
+          title: "DUERP",
+          urgency: "high",
+          summary: "Vérifiez la mise à jour du DUERP.",
+        },
+        {
+          user_id,
+          title: "Registre unique du personnel",
+          urgency: "high",
+          summary: "Contrôlez le registre du personnel.",
+        },
+        {
+          user_id,
+          title: "Médecine du travail",
+          urgency: "medium",
+          summary: "Vérifiez le suivi médical.",
+        },
+        {
+          user_id,
+          title: "Conformité RGPD",
+          urgency: "low",
+          summary: "Contrôlez vos obligations RGPD.",
+        },
+      ];
+  }
+
+  await supabaseAdmin
+    .from("alerts")
+    .insert(alerts);
+}
+
+return NextResponse.json({
+  success: true,
+  data,
+});
+
+} catch (error) {
+return NextResponse.json(
+{
+success: false,
+error: "Erreur serveur",
+},
+{ status: 500 }
+);
+}
+}

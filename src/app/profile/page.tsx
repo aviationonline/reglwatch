@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 export default function ProfilePage() {
   const [companyName, setCompanyName] = useState("");
@@ -15,6 +14,10 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function loadUser() {
+      const { createBrowserSupabaseClient } = await import(
+        "@/lib/supabase/browser"
+      );
+
       const supabase = createBrowserSupabaseClient();
 
       const {
@@ -29,9 +32,9 @@ export default function ProfilePage() {
     loadUser();
   }, []);
 
-  const handleSubmit = async (
+  async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
-  ) => {
+  ) {
     e.preventDefault();
 
     setLoading(true);
@@ -59,34 +62,30 @@ export default function ProfilePage() {
       return;
     }
 
-    setMessage("Entreprise enregistrée avec succès");
-    setLoading(false);
-  };
+    window.location.href = "/dashboard";
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
+
       <h1 className="text-4xl font-bold">
-        Profil entreprise
+        Configuration de votre entreprise
       </h1>
 
-      <p className="mt-2 text-slate-600">
-        Ces informations permettront à ReglWatch de filtrer
-        uniquement les réglementations qui vous concernent.
+      <p className="mt-3 text-gray-700">
+        Ces informations permettent à ReglWatch
+        de personnaliser votre veille réglementaire.
       </p>
-
-      <div className="mt-4 rounded-lg bg-slate-100 p-3 text-sm">
-        Utilisateur connecté :
-        <div className="mt-1 break-all font-mono">
-          {userId || "Chargement..."}
-        </div>
-      </div>
 
       <form
         onSubmit={handleSubmit}
         className="mt-10 space-y-6"
       >
+
         <div>
-          <label>Raison sociale</label>
+          <label className="block font-medium">
+            Raison sociale
+          </label>
 
           <input
             value={companyName}
@@ -94,13 +93,14 @@ export default function ProfilePage() {
               setCompanyName(e.target.value)
             }
             className="mt-2 w-full rounded-lg border p-3"
-            placeholder="Ma société"
             required
           />
         </div>
 
         <div>
-          <label>Forme juridique</label>
+          <label className="block font-medium">
+            Forme juridique
+          </label>
 
           <select
             value={legalForm}
@@ -118,7 +118,9 @@ export default function ProfilePage() {
         </div>
 
         <div>
-          <label>Nombre de salariés</label>
+          <label className="block font-medium">
+            Nombre de salariés
+          </label>
 
           <select
             value={employees}
@@ -136,7 +138,9 @@ export default function ProfilePage() {
         </div>
 
         <div>
-          <label>Secteur</label>
+          <label className="block font-medium">
+            Secteur
+          </label>
 
           <select
             value={sector}
@@ -163,15 +167,17 @@ export default function ProfilePage() {
         >
           {loading
             ? "Enregistrement..."
-            : "Enregistrer"}
+            : "Créer mon entreprise"}
         </button>
 
         {message && (
-          <p className="text-sm">
+          <p className="text-red-600">
             {message}
           </p>
         )}
+
       </form>
+
     </main>
   );
 }

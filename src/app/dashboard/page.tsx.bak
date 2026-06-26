@@ -19,7 +19,6 @@ export default function DashboardPage() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-        console.log("USER CONNECTE =", user?.id);
 
       if (!user) {
         router.push("/login");
@@ -30,7 +29,7 @@ export default function DashboardPage() {
         .from("subscriptions")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .single();
 
       if (
         !sub ||
@@ -45,8 +44,7 @@ export default function DashboardPage() {
       const { data: alertsData } = await supabase
         .from("alerts")
         .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", {
+        .order("published_at", {
           ascending: false,
         });
 
@@ -62,14 +60,11 @@ export default function DashboardPage() {
           ascending: false,
         })
         .limit(1)
-        .maybeSingle();
+        .single();
 
-      if (!companyData) {
-        router.push("/profile");
-        return;
+      if (companyData) {
+        setCompany(companyData);
       }
-
-      setCompany(companyData);
 
       setLoading(false);
     }
@@ -94,16 +89,17 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-10 text-black">
+    <main className="min-h-screen bg-slate-50 p-10">
       <div className="mx-auto max-w-7xl">
 
         <div className="flex items-center justify-between">
+
           <div>
             <h1 className="text-4xl font-bold">
               Tableau de bord ReglWatch
             </h1>
 
-            <p className="mt-2 text-gray-800 font-medium">
+            <p className="mt-2 text-slate-600">
               Votre veille réglementaire personnalisée.
             </p>
           </div>
@@ -114,20 +110,25 @@ export default function DashboardPage() {
           >
             Déconnexion
           </button>
+
         </div>
 
         <div className="mt-8 rounded-xl bg-white p-8 shadow">
+
           <h2 className="text-xl font-bold">
             Abonnement
           </h2>
 
           <div className="mt-4 space-y-2">
+
             <p>
-              <strong>Plan :</strong> {subscription.plan}
+              <strong>Plan :</strong>{" "}
+              {subscription.plan}
             </p>
 
             <p>
-              <strong>Statut :</strong> {subscription.status}
+              <strong>Statut :</strong>{" "}
+              {subscription.status}
             </p>
 
             <p>
@@ -138,16 +139,20 @@ export default function DashboardPage() {
                   ).toLocaleDateString("fr-FR")
                 : "-"}
             </p>
+
           </div>
+
         </div>
 
-        <div className="rounded-xl bg-white p-8 shadow-lg border border-gray-300" >
+        <div className="mt-8 rounded-xl bg-white p-8 shadow">
+
           <h2 className="text-xl font-bold">
             Votre entreprise
           </h2>
 
           {company ? (
             <div className="mt-6 space-y-3">
+
               <p>
                 <strong>Nom :</strong>{" "}
                 {company.company_name}
@@ -167,73 +172,92 @@ export default function DashboardPage() {
                 <strong>Effectif :</strong>{" "}
                 {company.employees}
               </p>
+
             </div>
           ) : (
-            <p className="mt-4 text-gray-700">
+            <p className="mt-4 text-slate-500">
               Aucune entreprise trouvée.
             </p>
           )}
+
         </div>
 
         <div className="mt-8 grid gap-6 md:grid-cols-4">
 
-          <div className="rounded-xl bg-white p-6 shadow-lg border border-gray-300" >
-            <div className="text-sm text-gray-700">
+          <div className="rounded-xl bg-white p-6 shadow">
+            <div className="text-sm text-slate-500">
               Actions obligatoires
             </div>
 
             <div className="mt-2 text-4xl font-bold text-red-600">
-              {alerts.filter(
-                (a) => a.urgency === "high"
-              ).length}
+              {
+                alerts.filter(
+                  (a) => a.urgency === "high"
+                ).length
+              }
             </div>
           </div>
 
           <div className="rounded-xl bg-white p-6 shadow">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-slate-500">
               Vigilance
             </div>
 
             <div className="mt-2 text-4xl font-bold text-orange-500">
-              {alerts.filter(
-                (a) => a.urgency === "medium"
-              ).length}
+              {
+                alerts.filter(
+                  (a) => a.urgency === "medium"
+                ).length
+              }
             </div>
           </div>
 
           <div className="rounded-xl bg-white p-6 shadow">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-slate-500">
               Informations
             </div>
 
             <div className="mt-2 text-4xl font-bold text-blue-500">
-              {alerts.filter(
-                (a) => a.urgency === "low"
-              ).length}
+              {
+                alerts.filter(
+                  (a) => a.urgency === "low"
+                ).length
+              }
             </div>
           </div>
 
           <div className="rounded-xl bg-white p-6 shadow">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-slate-500">
               Opportunités
             </div>
 
             <div className="mt-2 text-4xl font-bold text-green-600">
-              {alerts.filter(
-                (a) => a.urgency === "opportunity"
-              ).length}
+              {
+                alerts.filter(
+                  (a) => a.urgency === "opportunity"
+                ).length
+              }
             </div>
           </div>
 
         </div>
 
         <div className="mt-10 rounded-xl bg-white p-8 shadow">
+
           <h2 className="mb-6 text-2xl font-bold">
-            Dernières alertes réglementaires
+            Dernières alertes
           </h2>
 
+          <p className="mb-4 text-red-600">
+            Nombre d'alertes : {alerts.length}
+          </p>
+
+          <pre className="overflow-auto rounded bg-slate-100 p-4 text-xs">
+            {JSON.stringify(alerts, null, 2)}
+          </pre>
+
           {alerts.length === 0 ? (
-            <p className="text-gray-700">
+            <p className="text-slate-500">
               Aucune alerte disponible.
             </p>
           ) : (
@@ -242,28 +266,41 @@ export default function DashboardPage() {
               {alerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className="rounded-xl border border-slate-200 p-5"
+                  className="rounded-lg border p-4"
                 >
                   <div className="flex items-center justify-between">
 
-                    <h3 className="text-lg font-semibold">
+                    <h3 className="font-semibold">
                       {alert.title}
                     </h3>
 
-                    <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
+                    <span className="rounded bg-red-100 px-2 py-1 text-sm">
                       {alert.urgency}
                     </span>
 
                   </div>
 
-                  <p className="mt-3 text-gray-800">
+                  <p className="mt-2 text-slate-600">
                     {alert.summary}
                   </p>
 
+                  {alert.source_url && (
+                    <a
+                      href={alert.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-3 inline-block text-blue-600 hover:underline"
+                    >
+                      Consulter la source
+                    </a>
+                  )}
+
                 </div>
               ))}
+
             </div>
           )}
+
         </div>
 
       </div>

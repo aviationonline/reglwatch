@@ -22,10 +22,11 @@ export default function LoginPage() {
 
     const supabase = createBrowserSupabaseClient();
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
     if (error) {
       setMessage(error.message);
@@ -36,7 +37,7 @@ export default function LoginPage() {
     setMessage("Connexion réussie");
 
     setTimeout(() => {
-      router.push("/profile");
+      router.push("/dashboard");
     }, 1000);
   };
 
@@ -54,7 +55,9 @@ export default function LoginPage() {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
           className="mb-4 w-full rounded-lg border p-3"
           required
         />
@@ -63,7 +66,9 @@ export default function LoginPage() {
           type="password"
           placeholder="Mot de passe"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
           className="mb-4 w-full rounded-lg border p-3"
           required
         />
@@ -73,7 +78,9 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full rounded-lg bg-black px-4 py-3 text-white"
         >
-          {loading ? "Connexion..." : "Se connecter"}
+          {loading
+            ? "Connexion..."
+            : "Se connecter"}
         </button>
 
         {message && (

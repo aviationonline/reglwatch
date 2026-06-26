@@ -1,25 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { processDocument } from "@/lib/engine/processDocument";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
 
-  try {
+  const body = await req.json();
 
-    const body = await req.json();
+  const result = await processDocument(body.documentId);
 
-    const result = await processDocument(body.content);
-
-    return NextResponse.json(result);
-
-  } catch (e) {
-
-    console.error(e);
-
-    return NextResponse.json(
-      { error: "processing failed" },
-      { status: 500 }
-    );
-
-  }
+  return NextResponse.json(result);
 
 }

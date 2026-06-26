@@ -6,6 +6,12 @@ export async function saveRegulation(
   analysis: AnalysisResult
 ): Promise<string> {
 
+  const effectiveDate =
+    analysis.effective_date &&
+    analysis.effective_date.trim() !== ""
+      ? analysis.effective_date
+      : null;
+
   const { data, error } = await supabaseAdmin
     .from("regulations")
     .insert({
@@ -13,7 +19,7 @@ export async function saveRegulation(
       title: analysis.title,
       summary: analysis.summary,
       urgency: analysis.urgency,
-      effective_date: analysis.effective_date,
+      effective_date: effectiveDate,
       sectors: analysis.sectors,
       ai_summary: analysis.summary,
       status: "published",

@@ -3,25 +3,73 @@ import { analyze } from "./analyze";
 import { saveRegulation } from "./saveRegulation";
 import { saveObligations } from "./saveObligations";
 import { markProcessed } from "./markProcessed";
+import { saveAnalysis } from "./saveAnalysis";
+
+import { supabaseAdmin } from "../supabase/admin";
 
 export async function processDocument(documentId: string) {
 
-  const document = await extract(documentId);
+  try {
 
-  const analysis = await analyze(document);
+    const document = await extract(documentId);
 
-  const regulationId = await saveRegulation(
-    document.id,
-    analysis
-  );
+    if (!document) {
+      throw new Error("Document introuvable");
+    }
 
-  await saveObligations(
-    regulationId,
-    analysis
-  );
+    const analysis = await analyze(document);
 
-  await markProcessed(document.id);
+    await saveAnalysis(
+      document.id,
+      analysis
+    );
 
-  return analysis;
+    const regulationId = await saveRegulation(
+      document.id,
+      analysis
+    );
+
+    await saveObligations(
+      regulationId,
+      analysis
+    );
+
+    await markProcessed(document.id);
+
+    return {
+      success: true,
+      regulationId,
+      analysis
+    };
+
+  } catch (error) {
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Unknown error";
+
+    await supabaseAdmin
+      .from("source_documents")
+      .update({
+        processing_status: "error",
+        error_message: message
+      })
+      .eq("id", documentId);
+
+    await supabaseAdmin
+      .from("workflow_logs")
+      .insert({
+        workflow: "processDocument",
+        step: "pipeline",
+        status: "error",
+        message
+      });
+
+    return {
+      success: false,
+      error: message
+    };
+  }
 
 }

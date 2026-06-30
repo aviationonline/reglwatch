@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "../supabase/admin";
+import { DocumentRepository } from "../repositories/DocumentRepository";
 
 export interface PendingDocument {
   id: string;
@@ -10,19 +10,11 @@ export interface PendingDocument {
 
 export async function extract(documentId: string): Promise<PendingDocument> {
 
-  const { data, error } = await supabaseAdmin
-    .from("source_documents")
-    .select("*")
-    .eq("id", documentId)
-    .single();
+  const data = await DocumentRepository.getById(documentId);
 
-  if (error) {
-    throw error;
-  }
-
-  if (!data) {
-    throw new Error("Document introuvable");
-  }
+if (!data) {
+  throw new Error("Document introuvable");
+}
 
   return {
     id: data.id,
